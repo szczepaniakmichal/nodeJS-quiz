@@ -12,4 +12,4 @@ app.use(express.static(
     path.join(__dirname, 'public'),
 ));
 
-gameRoutes(app)
+gameRoutes(app);
