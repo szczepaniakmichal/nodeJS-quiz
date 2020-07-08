@@ -2,8 +2,8 @@ function gameRoutes(app) {
     let goodAnswers = 0;
     let isGameOver = false;
     let callToFriendUsed = false;
-    let questionToTheCrowdUsed = false;
     let halfOnHalfUsed = false;
+    let questionToTheCrowdUsed = false;
 
     const questions = [
         {
@@ -24,8 +24,6 @@ function gameRoutes(app) {
     ];
 
     app.get('/question', (req, res) => {
-        console.log("goodAnswers === questions.length", goodAnswers)
-        console.log("goodAnswers === questions.length", questions.length)
         if (goodAnswers === questions.length) {
             res.json({
                 winner: true,
@@ -68,6 +66,48 @@ function gameRoutes(app) {
             correct: isGoodAnswer,
             goodAnswers,
         });
+    })
+
+    app.get ('/help/friend', (req, res) => {
+        if (callToFriendUsed) {
+            return res.json({
+                text: 'To koło ratunkowe zostało juz wykorzystane',
+            })
+        }
+
+        callToFriendUsed = true;
+
+        const doesFriendKwonAnswer = Math.random() < 0.5;
+        const question = questions[goodAnswers];
+
+        res.json({
+            text: doesFriendKwonAnswer ? `Hmm, wydaje mi się, że odpowiedz to ${questions.answers[question.correctAnswer]}` : 'Hmm, no nie wiem'
+        })
+    })
+
+    app.get ('/help/half', (req, res) => {
+        if (halfOnHalfUsed) {
+            return res.json({
+                text: 'To koło ratunkowe zostało juz wykorzystane',
+            })
+        }
+
+        halfOnHalfUsed = true;
+
+        const doesFriendKwonAnswer = Math.random() < 0.5;
+        const question = questions[goodAnswers];
+
+        const answersCopy = question.answers.filter((s, index) => (
+            index !== question.correctAnswer
+        ))
+
+        console.log(answersCopy)
+
+        answersCopy.splice(~~(Math.random() * answersCopy.length), 1)
+
+        res.json({
+            answersToRemove: answersCopy,
+        })
     })
 }
 
