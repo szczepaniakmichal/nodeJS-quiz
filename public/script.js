@@ -1,7 +1,17 @@
 const question = document.querySelector('#question')
 const answerButtons = document.querySelectorAll('.answer');
+const goodAnswerSpan = document.querySelector('#good-answers');
+const gameBoard = document.querySelector('#game-board');
+const h2 = document.querySelector('h2');
 
 function fillQuestionElements(data) {
+    console.log("data w fillQuestionElements", data)
+    if (data.winner === true) {
+        gameBoard.style.display = 'none';
+        h2.textContent = 'Wygrałeś/aś';
+        return;
+    }
+
     question.innerText = data.question;
 
     // answerButtons.forEach((el, index) => {
@@ -22,10 +32,15 @@ function showNextQuestion() {
         .then(res => res.json())
         .then(data => {
             fillQuestionElements(data);
-        })
+        });
 }
 
 showNextQuestion();
+
+function handleAnswerFeedback(data) {
+    goodAnswerSpan.textContent = data.goodAnswers;
+    showNextQuestion();
+}
 
 function sendAnswer(answerIndex) {
     fetch(`/answer/${answerIndex}`, {
@@ -33,8 +48,7 @@ function sendAnswer(answerIndex) {
     })
         .then(res => res.json())
         .then(data => {
-            // fillQuestionElements(data);
-            console.log("data", data)
+            handleAnswerFeedback(data);
         })
 }
 

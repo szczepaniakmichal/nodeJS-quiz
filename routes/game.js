@@ -1,5 +1,6 @@
 function gameRoutes(app) {
     let goodAnswers = 0;
+    let isGameOver = false;
     let callToFriendUsed = false;
     let questionToTheCrowdUsed = false;
     let halfOnHalfUsed = false;
@@ -8,12 +9,12 @@ function gameRoutes(app) {
         {
             question: 'Jaki jest najlepszy język programowania?',
             answers: ['C++', 'Fortran', 'JavaScript', 'Java'],
-            correctAnswer: 2,
+            correctAnswer: 0,
         },
         {
             question: 'Czy ten kurs jest fajny?',
             answers: ['Nie', 'Nie wiem', 'Oczywiście, że tak', 'Jest najlepszy'],
-            correctAnswer: 3,
+            correctAnswer: 0,
         },
         {
             question: 'Czy chcesz zjeść pizze?',
@@ -23,9 +24,15 @@ function gameRoutes(app) {
     ];
 
     app.get('/question', (req, res) => {
+        console.log("goodAnswers === questions.length", goodAnswers)
+        console.log("goodAnswers === questions.length", questions.length)
         if (goodAnswers === questions.length) {
             res.json({
                 winner: true,
+            })
+        } else if (isGameOver) {
+            res.json({
+                loser: true,
             })
         } else {
             const nextQuestion = questions[goodAnswers];
@@ -39,11 +46,28 @@ function gameRoutes(app) {
     });
 
     app.post('/answer/:index', (req, res) => {
-        const {index} = req.params;
-        const question = questions[goodAnswers].correctAnswer;
+        if (isGameOver) {
             res.json({
-                correct: question === Number(index),
+                loser: true,
             })
+        }
+
+        const {index} = req.params;
+        const question = questions[goodAnswers];
+
+        const isGoodAnswer = question.correctAnswer === Number(index);
+
+
+        if (isGoodAnswer) {
+            goodAnswers++;
+        } else {
+            isGameOver = true;
+        }
+
+        res.json({
+            correct: isGoodAnswer,
+            goodAnswers,
+        });
     })
 }
 
