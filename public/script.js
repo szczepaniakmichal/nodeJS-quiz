@@ -6,6 +6,7 @@ const h2 = document.querySelector('h2');
 const btnCallToFriend = document.querySelector('#callToAFriend');
 const tip = document.querySelector('#tip');
 const halfOnHalf = document.querySelector('#halfOnHalf');
+const questionToTheCrowd = document.querySelector('#questionToTheCrowd');
 
 function fillQuestionElements(data) {
     // console.log("data w fillQuestionElements", data)
@@ -108,4 +109,26 @@ function handlehalfOnHalf() {
 }
 
 halfOnHalf.addEventListener('click', handlehalfOnHalf);
+
+function handleCrowdAnswer(data) {
+    if (typeof data.text === 'string') {
+        tip.textContent = data.text;
+    } else {
+        data.chart.forEach((percent, i) => {
+            answerButtons[i].textContent = `${answerButtons[i].textContent}: ${percent}%`;
+        });
+    }
+}
+
+function handlequestionToTheCrowd() {
+    fetch(`/help/crowd`, {
+        method: 'GET',
+    })
+        .then(res => res.json())
+        .then(data => {
+            handleCrowdAnswer(data);
+        })
+}
+
+questionToTheCrowd.addEventListener('click', handlequestionToTheCrowd)
 
